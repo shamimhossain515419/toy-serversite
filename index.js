@@ -38,13 +38,22 @@ async function run() {
         const result = await ToyShopCollection.insertOne(body);
        res.send(result)
       })
-
-      app.get('/alltoy', async(req,res)=>{
+     app.get('/alltoy', async(req,res)=>{
          const result= await ToyShopCollection.find().toArray();
          res.send(result)
       }) 
 
-    app.get('/shopdetils/:id', async (req, res) => {
+     app.get('/mytoy', async(req,res)=>{
+      // console.log(req.query.email);
+      let query = {};
+      if (req.query?.email) {
+          query = { email: req.query.email }
+      }
+        const result=await ToyShopCollection.find(query).toArray();
+        res.send(result)
+      })   
+
+app.get('/shopdetils/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       
@@ -52,6 +61,15 @@ async function run() {
       
    res.send(result);
     })
+
+//  delete aption 
+
+app.delete('/mytoy/:id', async (req,res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) }
+  const result = await ToyShopCollection.deleteOne(query);
+  res.send(result);
+})
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
