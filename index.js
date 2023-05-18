@@ -31,11 +31,14 @@ async function run() {
     const ToyShopCollection = client.db("ToycarDB").collection("ShopCategory");
 
 
-app.get('/shop', async(req,res)=>{
-  
-  const result=await ToyShopCollection.find().toArray();
-  res.send(result)
-})
+    app.get('/shop/:id', async (req, res) => {
+   const id = req.params.id;
+      console.log(id);
+      const query={category:id}
+     const result = await ToyShopCollection.find(query).toArray();
+      res.send(result)
+
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
