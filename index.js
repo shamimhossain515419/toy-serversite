@@ -7,11 +7,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// console.log(process.env.VITE_PASSWORD);
-
-// ToycarDB
-// ShopCategory
-
 
 const uri = `mongodb+srv://${process.env.VITE_USER}:${process.env.VITE_PASSWORD}@cluster0.jt15atw.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -38,14 +33,24 @@ async function run() {
       res.send(result)
 
     });
+    app.post('/shop',async(req,res)=>{
+        const body=req.body;
+        const result = await ToyShopCollection.insertOne(body);
+       res.send(result)
+      })
+
+      app.get('/alltoy', async(req,res)=>{
+         const result= await ToyShopCollection.find().toArray();
+         res.send(result)
+      }) 
 
     app.get('/shopdetils/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      console.log(id);
+      
       const result = await ToyShopCollection.findOne(query);
-      console.log(result);
-       res.send(result);
+      
+   res.send(result);
     })
 
     // Send a ping to confirm a successful connection
