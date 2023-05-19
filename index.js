@@ -33,6 +33,18 @@ async function run() {
     // });
     const ToyShopCollection = client.db("ToycarDB").collection("ShopCategory");
 
+    const indexKey={name:1 };
+    const indexOptions={name:"name" ,};
+    const result =await ToyShopCollection.createIndex(indexKey,indexOptions)
+    app.get("/toyCar/:text", async (req, res) => {
+      const findText = req.params.text;
+      const result = await ToyShopCollection
+        .find({name: { $regex: findText, $options: "i" }})
+        .toArray();
+      res.send(result);
+    });
+
+
 
     app.get('/shop/:id', async (req, res) => {
       const id = req.params.id;
@@ -49,9 +61,6 @@ async function run() {
 
 
     app.get('/shop', async (req, res) => {
-      // console.log(req.query.page);
-      // console.log(req.query.limit);
-   
       const limit= parseInt(req.query.limit) || 20;
    let query = {};
       if (req.query?.email) {
