@@ -16,13 +16,21 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
+ useNewUrlParser: true,
+ useUnifiedTopology:true,
+ maxPoolSize:10
 });
 
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    await client.connect((err)=>{
+       if(err){
+        console.log(err);
+         return ;
+       }
+    });
     const ToyShopCollection = client.db("ToycarDB").collection("ShopCategory");
 
 
@@ -33,43 +41,61 @@ async function run() {
       res.send(result)
 
     });
-    app.post('/shop',async(req,res)=>{
-        const body=req.body;
-        const result = await ToyShopCollection.insertOne(body);
-       res.send(result)
-      })
-     app.get('/alltoy', async(req,res)=>{
-         const result= await ToyShopCollection.find().toArray();
-         res.send(result)
-      }) 
+    app.post('/shop', async (req, res) => {
+      const body = req.body;
+      const result = await ToyShopCollection.insertOne(body);
+      res.send(result)
+    })
 
-     app.get('/mytoy', async(req,res)=>{
+
+    app.get('/shop', async (req, res) => {
       // console.log(req.query.email);
       let query = {};
       if (req.query?.email) {
-          query = { email: req.query.email }
+        query = { email: req.query.email }
       }
-        const result=await ToyShopCollection.find(query).toArray();
-        res.send(result)
-      })   
-
-app.get('/shopdetils/:id', async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      
-      const result = await ToyShopCollection.findOne(query);
-      
-   res.send(result);
+      const result = await ToyShopCollection.find(query).toArray();
+      res.send(result)
     })
 
-//  delete aption 
+    app.get('/shopdetils/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await ToyShopCollection.findOne(query);
+      res.send(result);
+    })
 
-app.delete('/mytoy/:id', async (req,res) => {
-  const id = req.params.id;
-  const query = { _id: new ObjectId(id) }
-  const result = await ToyShopCollection.deleteOne(query);
-  res.send(result);
-})
+    app.put('/shop/:id', async (req, res) => {
+      const id = req.params.id;
+      const car = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateCar = {
+        $set: {
+          name: car.name,
+          email: car.email,
+          price: car.price,
+          rating: car.rating,
+          description: car.description,
+          quantity: car.quantity,
+          image: car.image,
+          sellername: car.sellername,
+          category: car.category
+        },
+      };
+      const result = await ToyShopCollection.updateOne(filter, updateCar, options);
+      //  console.log(car);
+      res.send(result);
+    });
+
+    //  delete aption 
+
+    app.delete('/shopDelete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await ToyShopCollection.deleteOne(query);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
