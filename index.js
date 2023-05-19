@@ -25,12 +25,12 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect((err)=>{
-       if(err){
-        console.log(err);
-         return ;
-       }
-    });
+    // await client.connect((err)=>{
+    //    if(err){
+    //     console.log(err);
+    //      return ;
+    //    }
+    // });
     const ToyShopCollection = client.db("ToycarDB").collection("ShopCategory");
 
 
@@ -49,12 +49,15 @@ async function run() {
 
 
     app.get('/shop', async (req, res) => {
-      // console.log(req.query.email);
-      let query = {};
+      // console.log(req.query.page);
+      // console.log(req.query.limit);
+   
+      const limit= parseInt(req.query.limit) || 20;
+   let query = {};
       if (req.query?.email) {
         query = { email: req.query.email }
       }
-      const result = await ToyShopCollection.find(query).toArray();
+      const result = await ToyShopCollection.find(query).limit(limit).toArray();
       res.send(result)
     })
 
@@ -95,6 +98,11 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await ToyShopCollection.deleteOne(query);
       res.send(result);
+    })
+
+    app.get('/totalCar', async (req, res) => {
+      const result = await ToyShopCollection.estimatedDocumentCount();
+      res.send({ totalCar: result })
     })
 
     // Send a ping to confirm a successful connection
