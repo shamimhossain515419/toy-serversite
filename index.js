@@ -17,9 +17,9 @@ const client = new MongoClient(uri, {
     strict: true,
     deprecationErrors: true,
   },
- useNewUrlParser: true,
- useUnifiedTopology:true,
- maxPoolSize:10
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 10
 });
 
 async function run() {
@@ -33,13 +33,13 @@ async function run() {
     // });
     const ToyShopCollection = client.db("ToycarDB").collection("ShopCategory");
 
-    const indexKey={name:1 };
-    const indexOptions={name:"name" ,};
-    const result =await ToyShopCollection.createIndex(indexKey,indexOptions)
+    const indexKey = { name: 1 };
+    const indexOptions = { name: "name", };
+    const result = await ToyShopCollection.createIndex(indexKey, indexOptions)
     app.get("/toyCar/:text", async (req, res) => {
       const findText = req.params.text;
       const result = await ToyShopCollection
-        .find({name: { $regex: findText, $options: "i" }})
+        .find({ name: { $regex: findText, $options: "i" } })
         .toArray();
       res.send(result);
     });
@@ -55,26 +55,13 @@ async function run() {
     });
     app.post('/shop', async (req, res) => {
       const body = req.body;
-     const result = await ToyShopCollection.insertOne(body);
+      const result = await ToyShopCollection.insertOne(body);
       res.send(result)
     })
 
-
-    app.get('/shopsort/:text', async(req,res)=>{
-       const text=req.params.text;
-       if(text=="ascending"){
-        const result = await ToyShopCollection.find().sort({price:1}).toArray();
-        res.send(result)
-       } else if(text=="descending"){
-        const result = await ToyShopCollection.find().sort({price:-1}).toArray();
-        res.send(result)
-       }
-      
-    })
-
     app.get('/shop', async (req, res) => {
-      const limit= parseInt(req.query.limit) || 20;
-   let query = {};
+      const limit = parseInt(req.query.limit) || 20;
+      let query = {};
       if (req.query?.email) {
         query = { email: req.query.email }
       }
