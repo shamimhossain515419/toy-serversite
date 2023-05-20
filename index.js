@@ -55,10 +55,22 @@ async function run() {
     });
     app.post('/shop', async (req, res) => {
       const body = req.body;
-      const result = await ToyShopCollection.insertOne(body);
+     const result = await ToyShopCollection.insertOne(body);
       res.send(result)
     })
 
+
+    app.get('/shopsort/:text', async(req,res)=>{
+       const text=req.params.text;
+       if(text=="ascending"){
+        const result = await ToyShopCollection.find().sort({price:1}).toArray();
+        res.send(result)
+       } else if(text=="descending"){
+        const result = await ToyShopCollection.find().sort({price:-1}).toArray();
+        res.send(result)
+       }
+      
+    })
 
     app.get('/shop', async (req, res) => {
       const limit= parseInt(req.query.limit) || 20;
