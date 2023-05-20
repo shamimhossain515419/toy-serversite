@@ -69,6 +69,26 @@ async function run() {
       res.send(result)
     })
 
+
+app.get("/sorting/:id", async(req,res)=>{
+   const text=req.params.id;   
+   let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
+      }
+      if(text==="acending"){
+        const result = await ToyShopCollection.find(query).sort({price: 1}).toArray();
+        res.send(result);
+      }
+      if(text==="decending"){
+        const result = await ToyShopCollection.find(query).sort({price: -1}).toArray();
+        res.send(result);
+      }
+        
+})
+
+
+
     app.get('/shopdetils/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
